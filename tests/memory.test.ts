@@ -21,8 +21,8 @@ afterAll(async () => {
 
 describe('projectSlug', () => {
   it('把绝对路径换算成 Claude 的 slug', () => {
-    expect(projectSlug('D:/other/code/win/AgentResourceManager')).toBe(
-      'D--other-code-win-AgentResourceManager',
+    expect(projectSlug('D:/work/AgentResourceManager')).toBe(
+      'D--work-AgentResourceManager',
     );
   });
 
@@ -31,7 +31,7 @@ describe('projectSlug', () => {
   });
 
   it('处理盘符根路径', () => {
-    expect(projectSlug('C:/Users/BAI')).toBe('C--Users-BAI');
+    expect(projectSlug('C:/Users/example')).toBe('C--Users-example');
   });
 });
 

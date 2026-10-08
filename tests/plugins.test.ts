@@ -10,7 +10,7 @@ let marketplaces: string;
 let cacheDir: string;
 
 const INSTALL_DIR =
-  'C:\\Users\\BAI\\.claude\\plugins\\cache\\superpowers-marketplace\\superpowers\\5.1.0';
+  'C:\\Users\\example\\.claude\\plugins\\cache\\superpowers-marketplace\\superpowers\\5.1.0';
 
 beforeAll(async () => {
   tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'arm-plugins-'));

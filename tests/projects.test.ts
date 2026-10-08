@@ -21,16 +21,16 @@ describe('listProjects', () => {
       p,
       JSON.stringify({
         projects: {
-          'C:/Users/BAI': { hasTrustDialogAccepted: true },
-          'D:/other/code/win/AgentResourceManager': {},
+          'C:/Users/example': { hasTrustDialogAccepted: true },
+          'D:/work/AgentResourceManager': {},
         },
       }),
       'utf8',
     );
 
     expect(await listProjects(p)).toEqual([
-      'C:/Users/BAI',
-      'D:/other/code/win/AgentResourceManager',
+      'C:/Users/example',
+      'D:/work/AgentResourceManager',
     ]);
   });
 

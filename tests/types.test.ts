@@ -4,12 +4,12 @@ import type { Resource, ScanResult, SkillResource } from '../src/core/types';
 describe('领域模型', () => {
   it('SkillResource 可被判别为 skill 类型', () => {
     const skill: SkillResource = {
-      id: 'skill:c:/users/bai/.claude/skills/demo',
+      id: 'skill:c:/users/example/.claude/skills/demo',
       type: 'skill',
       name: 'demo',
       description: '示例',
-      path: 'C:/Users/BAI/.claude/skills/demo',
-      rawPaths: ['C:/Users/BAI/.claude/skills/demo'],
+      path: 'C:/Users/example/.claude/skills/demo',
+      rawPaths: ['C:/Users/example/.claude/skills/demo'],
       usedBy: ['claude', 'lingma'],
       scope: 'user',
       mtimeMs: 1,

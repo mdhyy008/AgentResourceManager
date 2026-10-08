@@ -25,7 +25,7 @@ const INDEX_LINE =
 /**
  * Claude Code 把项目绝对路径换算成 projects/ 下的目录名：
  * 把 `:`、`/`、`\` 全部替换成 `-`。
- * 已验证：D:/other/code/win/AgentResourceManager → D--other-code-win-AgentResourceManager
+ * 例如：D:/work/AgentResourceManager → D--work-AgentResourceManager
  *
  * 这个换算是不可逆的（路径里的 `-` 和分隔符无法区分），
  * 所以我们只做「正向计算 + 比对」，不去反推目录名对应的项目路径。
