@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import type { Stats } from 'node:fs';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -27,9 +28,7 @@ export async function exists(p: string): Promise<boolean> {
 }
 
 /** lstat，失败返回 null（不抛） */
-export async function statOrNull(
-  p: string,
-): Promise<Awaited<ReturnType<typeof fs.lstat>> | null> {
+export async function statOrNull(p: string): Promise<Stats | null> {
   try {
     return await fs.lstat(p);
   } catch {
