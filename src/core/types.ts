@@ -121,6 +121,8 @@ export interface ScannedAgent {
   name: string;
   /** 探测到的各类资源根路径 */
   paths: AdapterPaths;
+  /** 去重后，该 agent 能看到的资源条数 */
+  resourceCount: number;
 }
 
 export interface ScanResult {
