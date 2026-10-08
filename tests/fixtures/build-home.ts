@@ -140,6 +140,9 @@ export async function buildFixtureHome(): Promise<FixtureHome> {
     ),
   );
 
+  // ---- 用户级全局记忆 ----
+  await write(root, '.claude/CLAUDE.md', '# 全局记忆\n\n对所有项目生效。\n');
+
   // ---- 用户级 MCP（写在 ~/.claude.json 顶层） ----
   await write(
     root,

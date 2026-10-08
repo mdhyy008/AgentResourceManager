@@ -5,6 +5,7 @@ import { mergeResources } from './dedupe';
 import { exists, homeDir } from './fs-utils';
 import { listProjects, scanProjectResources } from './projects';
 import { scanMcpFromClaudeJson, scanMcpFromMcpJsonFile } from './scanners/mcp';
+import { scanMemoryFile } from './scanners/memory';
 import { scanPlugins } from './scanners/plugins';
 import { scanSkillsDir } from './scanners/skills';
 import type { Resource, ScanIssue, ScanResult, ScannedAgent } from './types';
@@ -48,6 +49,13 @@ export async function runScan(options: RunScanOptions = {}): Promise<ScanResult>
       const out = isClaudeJson
         ? await scanMcpFromClaudeJson(mcpFile, { agentId })
         : await scanMcpFromMcpJsonFile(mcpFile, { agentId, scope: 'user' });
+      rawResources.push(...out.resources);
+      issues.push(...out.issues);
+    }
+
+    // 用户级全局记忆文件（如 ~/.claude/CLAUDE.md）—— 对当前用户所有项目生效
+    for (const memoryFile of paths.memoryFiles ?? []) {
+      const out = await scanMemoryFile(memoryFile, { agentId, scope: 'user' });
       rawResources.push(...out.resources);
       issues.push(...out.issues);
     }

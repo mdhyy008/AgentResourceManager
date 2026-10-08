@@ -5,6 +5,7 @@ import {
   filterResources,
   groupIssuesByKind,
   matchesQuery,
+  projectLabel,
   sortResources,
   TYPE_LABELS,
 } from '../src/renderer/lib/filter';
@@ -142,5 +143,24 @@ describe('sortResources', () => {
     const sorted = sortResources(input);
     expect(sorted.map((r) => r.name)).toEqual(['a', 'b', 'c']);
     expect(input.map((r) => r.name)).toEqual(['c', 'a', 'b']);
+  });
+});
+
+describe('projectLabel', () => {
+  it('项目级资源取 projectPath 的最后一段作为项目名', () => {
+    expect(projectLabel(memory('MEMORY.md'))).toBe('proj');
+  });
+
+  it('Windows 反斜杠路径同样能取到最后一段', () => {
+    const r = skill('demo', { scope: 'project', projectPath: 'D:\\other\\code\\win\\some-app' });
+    expect(projectLabel(r)).toBe('some-app');
+  });
+
+  it('用户级资源返回 null', () => {
+    expect(projectLabel(skill('demo'))).toBeNull();
+  });
+
+  it('scope 是项目级但缺 projectPath 时返回 null，而不是抛错', () => {
+    expect(projectLabel(skill('demo', { scope: 'project' }))).toBeNull();
   });
 });

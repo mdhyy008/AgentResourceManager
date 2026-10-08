@@ -4,3 +4,5 @@ out/
 *.log
 .agent-resource-manager/
 arm-selfcheck*.png
+artifacts/
+.DS_Store

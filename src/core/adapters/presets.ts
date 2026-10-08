@@ -25,9 +25,12 @@ export function presetAdapter(
 }
 
 export const presetAdapters: Adapter[] = [
-  presetAdapter('codex', 'Codex CLI', '.codex'),
+  presetAdapter('codex', 'Codex CLI', '.codex', (root) => ({
+    memoryFiles: [path.join(root, 'AGENTS.md')],
+  })),
   presetAdapter('gemini', 'Gemini CLI', '.gemini', (root) => ({
     mcpFiles: [path.join(root, 'settings.json')],
+    memoryFiles: [path.join(root, 'GEMINI.md')],
   })),
   presetAdapter('windsurf', 'Windsurf', '.windsurf', (root) => ({
     mcpFiles: [path.join(root, 'mcp.json')],

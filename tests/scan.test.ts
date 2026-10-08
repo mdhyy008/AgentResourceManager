@@ -54,6 +54,16 @@ describe('runScan', () => {
     expect(projectResources.every((r) => typeof r.projectPath === 'string')).toBe(true);
   });
 
+  it('用户级全局记忆文件被扫到，scope 为 user', async () => {
+    const result = await runScan({ home });
+    const global = result.resources.find(
+      (r) => r.type === 'memory' && r.scope === 'user' && r.name === 'CLAUDE.md',
+    );
+    expect(global).toBeDefined();
+    expect(global!.usedBy).toEqual(['claude']);
+    expect(global!.path).toBe(path.join(home, '.claude', 'CLAUDE.md'));
+  });
+
   it('异常被收集起来而不是中断扫描', async () => {
     const result = await runScan({ home });
     const kinds = result.issues.map((i) => i.kind);

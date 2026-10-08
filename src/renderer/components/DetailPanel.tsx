@@ -1,4 +1,21 @@
-import { Alert, Box, Chip, Divider, Stack, Typography } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
+import EditIcon from '@mui/icons-material/Edit';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import ShareIcon from '@mui/icons-material/Share';
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  Divider,
+  FormControlLabel,
+  IconButton,
+  Stack,
+  Switch,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import type { ReactNode } from 'react';
 import type {
   McpResource,
@@ -8,9 +25,20 @@ import type {
   Resource,
   SkillResource,
 } from '../../core/types';
-import { TYPE_LABELS } from '../lib/filter';
+import { projectLabel, TYPE_LABELS } from '../lib/filter';
 
 const MONO = '"Cascadia Code", "JetBrains Mono", Consolas, "Courier New", monospace';
+
+/** 详情面板里能触发的编辑动作，由 App 接上写入流程 */
+export interface ResourceActions {
+  onToggleSkill(resource: SkillResource, enabled: boolean): void;
+  onEditFrontmatter(resource: SkillResource): void;
+  onShareSkill(resource: SkillResource): void;
+  onEditMemory(resource: MemoryResource): void;
+  onAddServer(resource: McpResource): void;
+  onRemoveServer(resource: McpResource, serverName: string): void;
+  onReveal(path: string): void;
+}
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -27,6 +55,7 @@ function Mono({ children }: { children: ReactNode }) {
   return (
     <Typography
       component="div"
+      className="arm-selectable"
       sx={{ fontFamily: MONO, fontSize: 12.5, wordBreak: 'break-all', lineHeight: 1.65 }}
     >
       {children}
@@ -67,6 +96,7 @@ function CodeBlock({ text }: { text: string }) {
   return (
     <Box
       component="pre"
+      className="arm-selectable"
       sx={{
         m: 0,
         p: 1.5,
@@ -98,7 +128,15 @@ function renderFrontmatter(fm: Record<string, unknown>): Array<[string, ReactNod
   });
 }
 
-function McpServerCard({ server, index }: { server: McpServerEntry; index: number }) {
+function McpServerCard({
+  server,
+  index,
+  onRemove,
+}: {
+  server: McpServerEntry;
+  index: number;
+  onRemove(): void;
+}) {
   const entries: Array<[string, ReactNode]> = [['传输方式', <Mono key="t">{server.transport}</Mono>]];
   if (server.command) entries.push(['命令', <Mono key="c">{server.command}</Mono>]);
   if (server.args?.length) entries.push(['参数', <Mono key="a">{server.args.join(' ')}</Mono>]);
@@ -110,16 +148,22 @@ function McpServerCard({ server, index }: { server: McpServerEntry; index: numbe
     <Box sx={{ mb: 1.5 }}>
       <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 0.75 }}>
         <Chip size="small" label={`#${index + 1}`} variant="outlined" />
-        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+        <Typography variant="body2" sx={{ fontWeight: 600, flex: 1 }} noWrap>
           {server.name}
         </Typography>
+        <Tooltip title="删除该 server" arrow>
+          <IconButton size="small" onClick={onRemove} aria-label={`删除 ${server.name}`}>
+            <DeleteOutlineIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
       </Stack>
       <KeyValue entries={entries} />
     </Box>
   );
 }
 
-function SkillDetail({ r }: { r: SkillResource }) {
+function SkillDetail({ r, actions }: { r: SkillResource; actions: ResourceActions }) {
+  const disabled = r.frontmatter['disable-model-invocation'] === true;
   return (
     <>
       {r.readOnly && (
@@ -128,17 +172,62 @@ function SkillDetail({ r }: { r: SkillResource }) {
           {r.pluginId ? ` 来源插件：${r.pluginId}` : ''}
         </Alert>
       )}
+      <Section title="启用状态">
+        <FormControlLabel
+          control={
+            <Switch
+              checked={!disabled}
+              disabled={r.readOnly}
+              onChange={(e) => actions.onToggleSkill(r, e.target.checked)}
+            />
+          }
+          label={disabled ? '已禁用' : '已启用'}
+        />
+        <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary' }}>
+          {r.readOnly
+            ? '只读，无法更改'
+            : disabled
+              ? 'frontmatter 里有 disable-model-invocation，模型不会自动调用它'
+              : '开启后会从 frontmatter 里移除 disable-model-invocation'}
+        </Typography>
+      </Section>
       <Section title="Frontmatter">
         <KeyValue entries={renderFrontmatter(r.frontmatter)} />
+        <Button
+          size="small"
+          variant="outlined"
+          startIcon={<EditIcon />}
+          disabled={r.readOnly}
+          onClick={() => actions.onEditFrontmatter(r)}
+          sx={{ mt: 1.25 }}
+        >
+          编辑 frontmatter
+        </Button>
       </Section>
       <Section title="正文">
         <CodeBlock text={r.body} />
+      </Section>
+      <Section title="共享">
+        <Button
+          size="small"
+          variant="outlined"
+          startIcon={<ShareIcon />}
+          disabled={r.readOnly}
+          onClick={() => actions.onShareSkill(r)}
+        >
+          共享给其它 agent
+        </Button>
+        <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', mt: 0.75 }}>
+          {r.readOnly
+            ? '只读的插件 skill 不提供共享'
+            : '把它放进另一个 agent 的 skills 目录，可选目录联接（同步）或复制（独立）'}
+        </Typography>
       </Section>
     </>
   );
 }
 
-function McpDetail({ r }: { r: McpResource }) {
+function McpDetail({ r, actions }: { r: McpResource; actions: ResourceActions }) {
   return (
     <>
       <Alert severity="warning" sx={{ mt: 2, borderRadius: '12px' }}>
@@ -156,14 +245,30 @@ function McpDetail({ r }: { r: McpResource }) {
             无
           </Typography>
         ) : (
-          r.servers.map((s, i) => <McpServerCard key={`${s.name}-${i}`} server={s} index={i} />)
+          r.servers.map((s, i) => (
+            <McpServerCard
+              key={`${s.name}-${i}`}
+              server={s}
+              index={i}
+              onRemove={() => actions.onRemoveServer(r, s.name)}
+            />
+          ))
         )}
+        <Button
+          size="small"
+          variant="outlined"
+          startIcon={<AddIcon />}
+          onClick={() => actions.onAddServer(r)}
+          sx={{ mt: 0.5 }}
+        >
+          新增 server
+        </Button>
       </Section>
     </>
   );
 }
 
-function MemoryDetail({ r }: { r: MemoryResource }) {
+function MemoryDetail({ r, actions }: { r: MemoryResource; actions: ResourceActions }) {
   return (
     <>
       <Section title="类型">
@@ -186,6 +291,15 @@ function MemoryDetail({ r }: { r: MemoryResource }) {
       )}
       <Section title="正文">
         <CodeBlock text={r.body} />
+        <Button
+          size="small"
+          variant="outlined"
+          startIcon={<EditIcon />}
+          onClick={() => actions.onEditMemory(r)}
+          sx={{ mt: 1.25 }}
+        >
+          编辑正文
+        </Button>
       </Section>
     </>
   );
@@ -212,20 +326,26 @@ function PluginDetail({ r }: { r: PluginResource }) {
   );
 }
 
-function Body({ r }: { r: Resource }) {
+function Body({ r, actions }: { r: Resource; actions: ResourceActions }) {
   switch (r.type) {
     case 'skill':
-      return <SkillDetail r={r} />;
+      return <SkillDetail r={r} actions={actions} />;
     case 'mcp':
-      return <McpDetail r={r} />;
+      return <McpDetail r={r} actions={actions} />;
     case 'memory':
-      return <MemoryDetail r={r} />;
+      return <MemoryDetail r={r} actions={actions} />;
     case 'plugin':
       return <PluginDetail r={r} />;
   }
 }
 
-export default function DetailPanel({ resource }: { resource: Resource | null }) {
+export default function DetailPanel({
+  resource,
+  actions,
+}: {
+  resource: Resource | null;
+  actions: ResourceActions;
+}) {
   return (
     <Box
       sx={{
@@ -253,6 +373,14 @@ export default function DetailPanel({ resource }: { resource: Resource | null })
           </Stack>
           <Typography variant="h6" sx={{ mt: 1.25 }}>
             {resource.name}
+            {projectLabel(resource) && (
+              <Box
+                component="span"
+                sx={{ color: 'text.secondary', fontWeight: 400, fontSize: '0.82em' }}
+              >
+                {`（${projectLabel(resource)}）`}
+              </Box>
+            )}
           </Typography>
           {resource.description && (
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
@@ -269,7 +397,20 @@ export default function DetailPanel({ resource }: { resource: Resource | null })
           </Section>
 
           <Section title="落盘路径">
-            <Mono>{resource.path}</Mono>
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'flex-start' }}>
+              <Box sx={{ minWidth: 0, flex: 1 }}>
+                <Mono>{resource.path}</Mono>
+              </Box>
+              <Tooltip title="在文件管理器中定位" arrow>
+                <IconButton
+                  size="small"
+                  onClick={() => actions.onReveal(resource.path)}
+                  aria-label="定位文件"
+                >
+                  <FolderOpenIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Stack>
             {resource.rawPaths.filter((p) => p !== resource.path).length > 0 && (
               <Box sx={{ mt: 0.75 }}>
                 {resource.rawPaths
@@ -286,7 +427,7 @@ export default function DetailPanel({ resource }: { resource: Resource | null })
             )}
           </Section>
 
-          <Body r={resource} />
+          <Body r={resource} actions={actions} />
         </Box>
       )}
     </Box>

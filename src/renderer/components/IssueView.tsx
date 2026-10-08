@@ -54,7 +54,10 @@ export default function IssueView({ issues, query }: IssueViewProps) {
                   bgcolor: 'background.paper',
                 }}
               >
-                <Typography sx={{ fontFamily: MONO, fontSize: 12.5, wordBreak: 'break-all' }}>
+                <Typography
+                  className="arm-selectable"
+                  sx={{ fontFamily: MONO, fontSize: 12.5, wordBreak: 'break-all' }}
+                >
                   {issue.path}
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>

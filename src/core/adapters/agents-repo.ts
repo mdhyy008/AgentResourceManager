@@ -14,6 +14,8 @@ export const agentsRepoAdapter: Adapter = {
     if (!(await exists(root))) return null;
     return {
       skills: path.join(root, 'skills'),
+      // 仓库根的 AGENTS.md 作为跨 agent 共享的全局记忆
+      memoryFiles: [path.join(root, 'AGENTS.md')],
     };
   },
 };

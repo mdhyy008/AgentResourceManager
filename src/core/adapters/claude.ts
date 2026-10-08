@@ -15,6 +15,8 @@ export const claudeAdapter: Adapter = {
       mcpFiles: [path.join(home, '.claude.json')],
       // ~/.claude/projects/<slug>/memory/*.md
       memoryDirs: [path.join(root, 'projects')],
+      // 全局记忆：对当前用户下所有项目生效
+      memoryFiles: [path.join(root, 'CLAUDE.md')],
       pluginsManifest: path.join(plugins, 'installed_plugins.json'),
       pluginsMarketplaces: path.join(plugins, 'known_marketplaces.json'),
       pluginsCacheDir: path.join(plugins, 'cache'),

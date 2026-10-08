@@ -68,6 +68,15 @@ export function filterResources(resources: Resource[], options: FilterOptions = 
   });
 }
 
+/**
+ * 项目级资源所属项目的目录名，用于在标题旁边标注它来自哪个项目。
+ * 用户级资源没有 projectPath，返回 null。
+ */
+export function projectLabel(r: Resource): string | null {
+  if (r.scope !== 'project' || !r.projectPath) return null;
+  return r.projectPath.split(/[\\/]/).filter(Boolean).pop() ?? null;
+}
+
 export function countByType(resources: Resource[]): Record<ResourceType, number> {
   const counts: Record<ResourceType, number> = { skill: 0, mcp: 0, memory: 0, plugin: 0 };
   for (const r of resources) counts[r.type] += 1;

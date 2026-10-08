@@ -29,7 +29,11 @@ export const theme = createTheme({
   components: {
     MuiCssBaseline: {
       styleOverrides: {
-        body: { overflow: 'hidden' },
+        // 界面文字（标题、导航、标签、按钮）一律不可选中；只有真正的内容——
+        // 路径、文件正文、diff——才允许复制，用 .arm-selectable 显式标出来。
+        // 表单控件单独放行，否则输入框里没法划选文字。
+        body: { overflow: 'hidden', userSelect: 'none' },
+        'input, textarea, [contenteditable="true"], .arm-selectable': { userSelect: 'text' },
         '*::-webkit-scrollbar': { width: 10, height: 10 },
         '*::-webkit-scrollbar-thumb': {
           backgroundColor: 'rgba(255,255,255,0.14)',
