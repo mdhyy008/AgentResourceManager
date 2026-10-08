@@ -2,6 +2,7 @@
   "name": "agent-resource-manager",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "description": "扫描并管理本机所有 AI agent 的 skill / MCP / 记忆 / 插件资源",
   "main": "out/main/index.js",
   "scripts": {

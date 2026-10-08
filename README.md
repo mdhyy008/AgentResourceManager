@@ -96,4 +96,4 @@ tests/        Vitest 单元测试，含一个「五脏俱全」的假 home fixtu
 
 ## 许可证
 
-暂未指定。
+[MIT](LICENSE) © 2026 mdhyy008
