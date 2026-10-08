@@ -92,6 +92,24 @@ describe('filterResources', () => {
     const out = filterResources(list, { type: 'skill', scope: 'user', query: 'A' });
     expect(out.map((r) => r.name)).toEqual(['a']);
   });
+
+  it('按 agent 过滤：只要 usedBy 含该 agent 的', () => {
+    const shared = skill('shared', { usedBy: ['claude', 'lingma'] });
+    const onlyCursor = skill('cursor-only', { usedBy: ['cursor'] });
+    const out = filterResources([shared, onlyCursor], { agent: 'lingma' });
+    expect(out.map((r) => r.name)).toEqual(['shared']);
+  });
+
+  it('agent 传 null 等同于不按 agent 过滤', () => {
+    expect(filterResources(list, { agent: null })).toHaveLength(3);
+  });
+
+  it('agent 与 type 可叠加', () => {
+    const a = skill('a', { usedBy: ['claude'] });
+    const b = memory('b', { usedBy: ['claude'] });
+    const out = filterResources([a, b], { agent: 'claude', type: 'memory' });
+    expect(out.map((r) => r.name)).toEqual(['b']);
+  });
 });
 
 describe('countByType', () => {

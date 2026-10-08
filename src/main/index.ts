@@ -104,6 +104,14 @@ function attachSelfCheck(win: BrowserWindow): void {
             })`,
           );
           console.log(`[selfcheck] ${summary}`);
+
+          // 可选：在页面里跑一段脚本（比如模拟点击），用来验证交互后的状态
+          const script = process.env.ARM_SELFCHECK_SCRIPT;
+          if (script) {
+            const scriptResult = await win.webContents.executeJavaScript(script);
+            console.log(`[selfcheck:script] ${JSON.stringify(scriptResult)}`);
+          }
+
           const image = await win.webContents.capturePage();
           const out = path.resolve(process.cwd(), target);
           await fs.writeFile(out, image.toPNG());

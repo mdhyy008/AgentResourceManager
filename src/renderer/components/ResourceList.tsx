@@ -1,7 +1,13 @@
 import LockIcon from '@mui/icons-material/Lock';
-import { Box, Chip, CircularProgress, List, ListItemButton, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Box, Chip, CircularProgress, List, ListItemButton, Stack, Typography } from '@mui/material';
 import type { Resource, ResourceScope } from '../../core/types';
 import { TYPE_LABELS } from '../lib/filter';
+
+const SCOPE_OPTIONS: Array<{ value: ResourceScope | 'all'; label: string }> = [
+  { value: 'all', label: '全部' },
+  { value: 'user', label: '用户级' },
+  { value: 'project', label: '项目级' },
+];
 
 interface ResourceListProps {
   resources: Resource[];
@@ -40,19 +46,23 @@ export default function ResourceList({
         <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
           {resources.length} 项
         </Typography>
-        <ToggleButtonGroup
-          exclusive
-          size="small"
-          value={scope}
-          onChange={(_e, value: ResourceScope | 'all' | null) => {
-            if (value !== null) onScopeChange(value);
-          }}
-          sx={{ '& .MuiToggleButton-root': { borderRadius: '10px', px: 1.5, py: 0.25, textTransform: 'none' } }}
-        >
-          <ToggleButton value="all">全部</ToggleButton>
-          <ToggleButton value="user">用户级</ToggleButton>
-          <ToggleButton value="project">项目级</ToggleButton>
-        </ToggleButtonGroup>
+        <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
+          {SCOPE_OPTIONS.map((opt) => {
+            const active = scope === opt.value;
+            return (
+              <Chip
+                key={opt.value}
+                size="small"
+                clickable
+                label={opt.label}
+                variant={active ? 'filled' : 'outlined'}
+                color={active ? 'primary' : 'default'}
+                onClick={() => onScopeChange(opt.value)}
+                sx={{ height: 26, px: 0.5, borderColor: active ? undefined : 'divider' }}
+              />
+            );
+          })}
+        </Stack>
       </Box>
 
       {loading && resources.length === 0 ? (

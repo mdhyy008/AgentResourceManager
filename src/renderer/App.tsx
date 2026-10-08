@@ -1,6 +1,6 @@
 import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { ResourceScope } from '../core/types';
+import type { AgentId, ResourceScope } from '../core/types';
 import type { AppConfig, ScanState } from '../shared/ipc';
 import CustomAgentDialog from './components/CustomAgentDialog';
 import DetailPanel from './components/DetailPanel';
@@ -20,6 +20,7 @@ export default function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [scope, setScope] = useState<ResourceScope | 'all'>('all');
+  const [agent, setAgent] = useState<AgentId | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -56,6 +57,13 @@ export default function App() {
   const resources = useMemo(() => result?.resources ?? [], [result]);
   const issues = useMemo(() => result?.issues ?? [], [result]);
   const counts = useMemo(() => countByType(resources), [resources]);
+
+  // 重扫后选中的 agent 可能已经不存在了，此时自动退回「不筛选」
+  const activeAgent = useMemo(
+    () => (agent && result?.agents.some((a) => a.id === agent) ? agent : null),
+    [agent, result],
+  );
+
   const visible = useMemo(
     () =>
       sortResources(
@@ -63,9 +71,10 @@ export default function App() {
           type: nav === 'issues' ? undefined : nav,
           query,
           scope,
+          agent: activeAgent,
         }),
       ),
-    [resources, nav, query, scope],
+    [resources, nav, query, scope, activeAgent],
   );
   const selected = useMemo(
     () => resources.find((r) => r.id === selectedId) ?? null,
@@ -90,6 +99,8 @@ export default function App() {
         refreshing={refreshing}
         onOpenCustomAgents={() => setDialogOpen(true)}
         customAgentCount={config.customAgents.length}
+        selectedAgent={activeAgent}
+        onSelectAgent={setAgent}
       />
 
       <Box sx={{ display: 'flex', flex: 1, minHeight: 0 }}>

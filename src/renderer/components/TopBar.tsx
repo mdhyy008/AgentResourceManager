@@ -14,7 +14,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import type { ScannedAgent } from '../../core/types';
+import type { AgentId, ScannedAgent } from '../../core/types';
 
 function formatTime(ms: number | null): string {
   if (ms === null) return '尚未扫描';
@@ -34,6 +34,8 @@ interface TopBarProps {
   refreshing: boolean;
   onOpenCustomAgents(): void;
   customAgentCount: number;
+  selectedAgent: AgentId | null;
+  onSelectAgent(id: AgentId | null): void;
 }
 
 export default function TopBar({
@@ -47,6 +49,8 @@ export default function TopBar({
   refreshing,
   onOpenCustomAgents,
   customAgentCount,
+  selectedAgent,
+  onSelectAgent,
 }: TopBarProps) {
   return (
     <AppBar
@@ -67,16 +71,22 @@ export default function TopBar({
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
-          {agents.map((agent) => (
-            <Tooltip key={agent.id} title={agent.name} arrow>
-              <Chip
-                size="small"
-                label={`${agent.name} · ${agent.resourceCount}`}
-                variant="outlined"
-                sx={{ borderColor: 'divider' }}
-              />
-            </Tooltip>
-          ))}
+          {agents.map((agent) => {
+            const active = selectedAgent === agent.id;
+            return (
+              <Tooltip key={agent.id} title={active ? '点击取消筛选' : `${agent.name} · 点击筛选`} arrow>
+                <Chip
+                  size="small"
+                  clickable
+                  label={`${agent.name} · ${agent.resourceCount}`}
+                  variant={active ? 'filled' : 'outlined'}
+                  color={active ? 'primary' : 'default'}
+                  onClick={() => onSelectAgent(active ? null : agent.id)}
+                  sx={{ borderColor: active ? undefined : 'divider' }}
+                />
+              </Tooltip>
+            );
+          })}
           {customAgentCount > 0 && (
             <Chip size="small" label={`自定义 · ${customAgentCount}`} color="secondary" variant="outlined" />
           )}

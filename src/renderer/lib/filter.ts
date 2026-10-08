@@ -1,4 +1,5 @@
 import type {
+  AgentId,
   Resource,
   ResourceScope,
   ResourceType,
@@ -31,6 +32,8 @@ export interface FilterOptions {
   query?: string;
   /** 不填等同于 all */
   scope?: ResourceScope | 'all';
+  /** 只看该 agent 能看到的资源 */
+  agent?: AgentId | null;
 }
 
 /** 把一条资源的可搜索字段拼成一个小写 haystack */
@@ -56,10 +59,11 @@ export function matchesQuery(r: Resource, query: string): boolean {
 }
 
 export function filterResources(resources: Resource[], options: FilterOptions = {}): Resource[] {
-  const { type, query = '', scope = 'all' } = options;
+  const { type, query = '', scope = 'all', agent = null } = options;
   return resources.filter((r) => {
     if (type && r.type !== type) return false;
     if (scope !== 'all' && r.scope !== scope) return false;
+    if (agent && !r.usedBy.includes(agent)) return false;
     return matchesQuery(r, query);
   });
 }
