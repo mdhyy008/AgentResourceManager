@@ -7,6 +7,7 @@ import { agentsRepoAdapter } from '../src/core/adapters/agents-repo';
 import { claudeAdapter } from '../src/core/adapters/claude';
 import { cursorAdapter } from '../src/core/adapters/cursor';
 import { lingmaAdapter } from '../src/core/adapters/lingma';
+import { presetAdapters } from '../src/core/adapters/presets';
 import type { Adapter } from '../src/core/adapters/types';
 
 const fakeHome = '/definitely/not/here';
@@ -107,5 +108,26 @@ describe('lingmaAdapter', () => {
   it('探测 .lingma/skills', async () => {
     const paths = await lingmaAdapter.detect(home);
     expect(paths!.skills).toBe(path.join(home, '.lingma', 'skills'));
+  });
+});
+
+describe('presetAdapters', () => {
+  it('包含五个预置 agent', () => {
+    expect(presetAdapters.map((a) => a.id).sort()).toEqual(
+      ['codex', 'continue', 'gemini', 'trae', 'windsurf'].sort(),
+    );
+  });
+
+  it('本机没有这些目录时全部返回 null，不抛错', async () => {
+    for (const adapter of presetAdapters) {
+      expect(await adapter.detect(home)).toBeNull();
+    }
+  });
+
+  it('目录存在时能被探测到', async () => {
+    await fs.mkdir(path.join(home, '.codex'), { recursive: true });
+    const codex = presetAdapters.find((a) => a.id === 'codex')!;
+    const paths = await codex.detect(home);
+    expect(paths!.skills).toBe(path.join(home, '.codex', 'skills'));
   });
 });

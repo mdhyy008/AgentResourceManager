@@ -3,6 +3,7 @@ import { claudeAdapter } from './claude';
 import { agentsRepoAdapter } from './agents-repo';
 import { cursorAdapter } from './cursor';
 import { lingmaAdapter } from './lingma';
+import { presetAdapters } from './presets';
 
 export type { Adapter, DetectedAgent } from './types';
 
@@ -12,6 +13,7 @@ export const registeredAdapters: Adapter[] = [
   cursorAdapter,
   lingmaAdapter,
   agentsRepoAdapter,
+  ...presetAdapters,
 ];
 
 /**
