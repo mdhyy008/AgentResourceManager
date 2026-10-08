@@ -1,5 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import * as fs from 'node:fs/promises';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { detectAll, registeredAdapters } from '../src/core/adapters';
+import { agentsRepoAdapter } from '../src/core/adapters/agents-repo';
+import { claudeAdapter } from '../src/core/adapters/claude';
+import { cursorAdapter } from '../src/core/adapters/cursor';
+import { lingmaAdapter } from '../src/core/adapters/lingma';
 import type { Adapter } from '../src/core/adapters/types';
 
 const fakeHome = '/definitely/not/here';
@@ -43,5 +50,62 @@ describe('adapter 注册表', () => {
     };
     const detected = await detectAll(fakeHome, [boom]);
     expect(detected).toEqual([]);
+  });
+});
+
+let home: string;
+
+beforeAll(async () => {
+  home = await fs.mkdtemp(path.join(os.tmpdir(), 'arm-adapters-'));
+  await fs.mkdir(path.join(home, '.claude', 'plugins', 'cache'), { recursive: true });
+  await fs.mkdir(path.join(home, '.claude', 'skills'), { recursive: true });
+  await fs.mkdir(path.join(home, '.claude', 'projects'), { recursive: true });
+  await fs.mkdir(path.join(home, '.agents', 'skills'), { recursive: true });
+  await fs.mkdir(path.join(home, '.cursor', 'skills'), { recursive: true });
+  await fs.mkdir(path.join(home, '.lingma', 'skills'), { recursive: true });
+  await fs.writeFile(path.join(home, '.claude.json'), '{}', 'utf8');
+});
+
+afterAll(async () => {
+  await fs.rm(home, { recursive: true, force: true });
+});
+
+describe('claudeAdapter', () => {
+  it('探测出各类资源路径', async () => {
+    const paths = await claudeAdapter.detect(home);
+    expect(paths).not.toBeNull();
+    expect(paths!.skills).toBe(path.join(home, '.claude', 'skills'));
+    expect(paths!.mcpFiles).toEqual([path.join(home, '.claude.json')]);
+    expect(paths!.memoryDirs).toEqual([path.join(home, '.claude', 'projects')]);
+    expect(paths!.pluginsManifest).toBe(
+      path.join(home, '.claude', 'plugins', 'installed_plugins.json'),
+    );
+    expect(paths!.pluginsCacheDir).toBe(path.join(home, '.claude', 'plugins', 'cache'));
+  });
+
+  it('目录不存在时返回 null', async () => {
+    expect(await claudeAdapter.detect('/no/such/home')).toBeNull();
+  });
+});
+
+describe('agentsRepoAdapter', () => {
+  it('探测 .agents/skills', async () => {
+    const paths = await agentsRepoAdapter.detect(home);
+    expect(paths!.skills).toBe(path.join(home, '.agents', 'skills'));
+  });
+});
+
+describe('cursorAdapter', () => {
+  it('探测 .cursor/skills 与 mcp.json', async () => {
+    const paths = await cursorAdapter.detect(home);
+    expect(paths!.skills).toBe(path.join(home, '.cursor', 'skills'));
+    expect(paths!.mcpFiles).toEqual([path.join(home, '.cursor', 'mcp.json')]);
+  });
+});
+
+describe('lingmaAdapter', () => {
+  it('探测 .lingma/skills', async () => {
+    const paths = await lingmaAdapter.detect(home);
+    expect(paths!.skills).toBe(path.join(home, '.lingma', 'skills'));
   });
 });

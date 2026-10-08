@@ -1,9 +1,18 @@
 import type { Adapter, DetectedAgent } from './types';
+import { claudeAdapter } from './claude';
+import { agentsRepoAdapter } from './agents-repo';
+import { cursorAdapter } from './cursor';
+import { lingmaAdapter } from './lingma';
 
 export type { Adapter, DetectedAgent } from './types';
 
-/** 内置的 adapter 列表，由 adapters/registry 在 Task 6/7 中填充 */
-export const registeredAdapters: Adapter[] = [];
+/** 内置的 adapter 列表 */
+export const registeredAdapters: Adapter[] = [
+  claudeAdapter,
+  cursorAdapter,
+  lingmaAdapter,
+  agentsRepoAdapter,
+];
 
 /**
  * 逐个探测，失败（返回 null 或抛错）的直接跳过。
