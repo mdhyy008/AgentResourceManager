@@ -43,7 +43,7 @@ function KeyValue({ entries }: { entries: Array<[string, ReactNode]> }) {
     );
   }
   return (
-    <Stack divider={<Divider flexItem />} sx={{ border: 1, borderColor: 'divider', borderRadius: 3 }}>
+    <Stack divider={<Divider flexItem />} sx={{ border: 1, borderColor: 'divider', borderRadius: '12px' }}>
       {entries.map(([k, v]) => (
         <Box key={k} sx={{ px: 1.5, py: 1, display: 'flex', gap: 2 }}>
           <Typography sx={{ fontFamily: MONO, fontSize: 12.5, color: 'text.secondary', minWidth: 96 }}>
@@ -80,7 +80,7 @@ function CodeBlock({ text }: { text: string }) {
         bgcolor: 'rgba(255,255,255,0.03)',
         border: 1,
         borderColor: 'divider',
-        borderRadius: 3,
+        borderRadius: '12px',
       }}
     >
       {text}
@@ -123,7 +123,7 @@ function SkillDetail({ r }: { r: SkillResource }) {
   return (
     <>
       {r.readOnly && (
-        <Alert severity="info" sx={{ mt: 2, borderRadius: 3 }}>
+        <Alert severity="info" sx={{ mt: 2, borderRadius: '12px' }}>
           该 skill 随插件安装，插件升级会覆盖，因此在只读状态下不提供编辑。
           {r.pluginId ? ` 来源插件：${r.pluginId}` : ''}
         </Alert>
@@ -141,7 +141,7 @@ function SkillDetail({ r }: { r: SkillResource }) {
 function McpDetail({ r }: { r: McpResource }) {
   return (
     <>
-      <Alert severity="warning" sx={{ mt: 2, borderRadius: 3 }}>
+      <Alert severity="warning" sx={{ mt: 2, borderRadius: '12px' }}>
         下方按原值展示命令、环境变量与请求头，未做脱敏。
       </Alert>
       <Section title="配置文件">
@@ -202,7 +202,7 @@ function PluginDetail({ r }: { r: PluginResource }) {
 
   return (
     <>
-      <Alert severity="info" sx={{ mt: 2, borderRadius: 3 }}>
+      <Alert severity="info" sx={{ mt: 2, borderRadius: '12px' }}>
         插件自带的所有 skill 均为只读，会随插件更新被覆盖。
       </Alert>
       <Section title="插件信息">

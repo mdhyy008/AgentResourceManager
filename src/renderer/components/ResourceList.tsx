@@ -47,7 +47,7 @@ export default function ResourceList({
           onChange={(_e, value: ResourceScope | 'all' | null) => {
             if (value !== null) onScopeChange(value);
           }}
-          sx={{ '& .MuiToggleButton-root': { borderRadius: 999, px: 1.5, py: 0.25, textTransform: 'none' } }}
+          sx={{ '& .MuiToggleButton-root': { borderRadius: '10px', px: 1.5, py: 0.25, textTransform: 'none' } }}
         >
           <ToggleButton value="all">全部</ToggleButton>
           <ToggleButton value="user">用户级</ToggleButton>

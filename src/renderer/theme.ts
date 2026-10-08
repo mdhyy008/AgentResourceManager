@@ -18,7 +18,7 @@ export const theme = createTheme({
     divider: 'rgba(255, 255, 255, 0.08)',
     text: { primary: '#E6E8EE', secondary: '#9AA3B2' },
   },
-  shape: { borderRadius: 16 },
+  shape: { borderRadius: 12 },
   typography: {
     fontFamily:
       '"Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, -apple-system, sans-serif',
@@ -52,18 +52,18 @@ export const theme = createTheme({
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {
-        root: { textTransform: 'none', borderRadius: 999, fontWeight: 500 },
+        root: { textTransform: 'none', borderRadius: 10, fontWeight: 500 },
       },
     },
     MuiChip: {
       styleOverrides: {
-        root: { borderRadius: 999, fontWeight: 500 },
+        root: { borderRadius: 8, fontWeight: 500 },
         sizeSmall: { height: 24 },
       },
     },
     MuiListItemButton: {
       styleOverrides: {
-        root: { borderRadius: 999, margin: '0 10px', paddingTop: 8, paddingBottom: 8 },
+        root: { borderRadius: 10, margin: '0 10px', paddingTop: 8, paddingBottom: 8 },
       },
     },
     MuiTextField: {
@@ -71,11 +71,11 @@ export const theme = createTheme({
     },
     MuiOutlinedInput: {
       styleOverrides: {
-        root: { borderRadius: 999 },
+        root: { borderRadius: 12 },
       },
     },
     MuiDialog: {
-      styleOverrides: { paper: { borderRadius: 24, backgroundImage: 'none' } },
+      styleOverrides: { paper: { borderRadius: 20, backgroundImage: 'none' } },
     },
     MuiTooltip: {
       styleOverrides: { tooltip: { borderRadius: 10, fontSize: 12 } },

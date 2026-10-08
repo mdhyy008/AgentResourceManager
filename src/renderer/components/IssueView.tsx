@@ -48,7 +48,7 @@ export default function IssueView({ issues, query }: IssueViewProps) {
                 sx={{
                   border: 1,
                   borderColor: 'divider',
-                  borderRadius: 3,
+                  borderRadius: '12px',
                   px: 2,
                   py: 1.25,
                   bgcolor: 'background.paper',

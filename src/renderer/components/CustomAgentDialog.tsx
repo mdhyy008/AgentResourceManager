@@ -195,7 +195,7 @@ export default function CustomAgentDialog({
             onChange={(e) => setMcpFiles(e.target.value)}
             fullWidth
           />
-          {error && <Alert severity="warning" sx={{ borderRadius: 3 }}>{error}</Alert>}
+          {error && <Alert severity="warning" sx={{ borderRadius: '12px' }}>{error}</Alert>}
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
